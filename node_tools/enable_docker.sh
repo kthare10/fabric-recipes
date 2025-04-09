@@ -50,7 +50,6 @@ if [[ $image == "default_ubuntu_20" ]]; then
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     sudo apt-get update
     sudo mkdir -p /etc/docker
-    sudo cp ${script_dir}/docker/daemon.json /etc/docker/daemon.json
     sudo apt-get install -y docker-ce
     sudo usermod -aG docker ubuntu
     sudo apt-get install -y openvswitch-switch
@@ -65,7 +64,6 @@ elif [[ $image == "default_ubuntu_22" || $image == "default_ubuntu_24" ]]; then
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     sudo apt-get update
     sudo mkdir -p /etc/docker
-    sudo cp ${script_dir}/docker/daemon.json /etc/docker/daemon.json
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo usermod -aG docker ubuntu
     sudo apt-get install -y openvswitch-switch
@@ -78,7 +76,6 @@ elif [[ $image == "default_rocky_8" ]]; then
     sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
     sudo dnf install -y docker-ce docker-ce-cli containerd.io
     sudo mkdir -p /etc/docker
-    sudo cp ${script_dir}/docker/daemon.json /etc/docker/daemon.json
     sudo systemctl start docker
     sudo usermod -aG docker rocky
     sudo dnf install -y https://repos.fedorapeople.org/repos/openstack/openstack-yoga/rdo-release-yoga-1.el8.noarch.rpm
@@ -95,7 +92,6 @@ elif [[ $image == "default_rocky_9" ]]; then
     sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
     sudo dnf install -y docker-ce docker-ce-cli containerd.io
     sudo mkdir -p /etc/docker
-    sudo cp ${script_dir}/docker/daemon.json /etc/docker/daemon.json
     sudo systemctl start docker
     sudo usermod -aG docker rocky
     sudo dnf install -y centos-release-nfv-openvswitch
@@ -111,3 +107,6 @@ else
     echo "Invalid or unsupported image type: $image"
     exit 1
 fi
+
+sudo usermod -aG docker $(whoami)
+newgrp docker
