@@ -16,7 +16,12 @@ We have added a new notebook demonstrating how to deploy and run perfSONAR-based
 
 This notebook is particularly useful for mobile edge simulations (e.g., ship-to-shore), but can also be generalized for any network performance experiment between FABRIC sites.
 
-Here's the documentation snippet you can add to your [`fabric-recipes`](https://github.com/kthare10/fabric-recipes/blob/main/README.md) `README.md` for the newly uploaded notebook:
+* **perfsonar-psconfig.ipynb**
+  *  Deploys a central VM with perfSONAR Testpoint, perfSONAR Archive and perfSONAR Grafana.
+  *  Deploys one or more Remote VM with perfSONAR Testpoint, perfSONAR Archive and perfSONAR Grafana.
+  *  Configures Hosts on the Central VM via psConfig.
+  *  Configures Hosts, Tests, Schedulues, Tasks on Remote VMs.
+  *  All tests are archived locally on each Remote VM and optionally on the Central VM.
 
 ---
 
