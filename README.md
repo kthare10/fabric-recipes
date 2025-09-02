@@ -23,6 +23,13 @@ This notebook is particularly useful for mobile edge simulations (e.g., ship-to-
   *  Configures Hosts, Tests, Schedulues, Tasks on Remote VMs.
   *  All tests are archived locally on each Remote VM and optionally on the Central VM.
 
+* **perfsonar-psconfig-fabnetv4ext.ipynb**
+Similar to the pSConfig notebook, but connects VMs via **FabNetv4Ext** for public Internet access.  
+- Provides site-routable IPv4 addresses  
+- Allows direct access to Toolkit UIs, Grafana, and archives from outside FABRIC  
+- Supports forward/reverse tests, multi-stream throughput, and slip-randomized schedules  
+
+Best for experiments needing **external visibility** and off-platform validation.
 ---
 
 ## 2:  static_routes_sshuttle
