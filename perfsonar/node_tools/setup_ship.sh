@@ -8,10 +8,15 @@ log() { printf '[%(%H:%M:%S)T] %s\n' -1 "$*"; }
 usage() {
   printf '%s\n' \
 "Usage:" \
-"  ./setup_ship.sh --token TOKEN --hosts \"IP@name,IP2@name2\" --urls \"https://a/ps,https://b/ps\"" \
+"  ./setup_ship.sh --token TOKEN --hosts \"IP@name[%srcIP] ...\" --urls \"https://a/ps,https://b/ps\"" \
 "                 [--workdir PATH] [--archiver-repo URL] [--psx-repo URL]" \
 "                 [--archiver-branch BRANCH] [--psx-branch BRANCH]" \
 "                 [--no-sudo] [--verbose]" \
+"" \
+"Host format:" \
+"  ip@name              — single network (backward compatible)" \
+"  ip@name%src_ip       — multi-network: bind pscheduler --source to src_ip" \
+"  ip@name%iface        — multi-network: resolve iface IP at runtime, bind --source" \
 "" \
 "Defaults:" \
 "  --workdir            \$PWD" \
@@ -21,9 +26,15 @@ usage() {
 "  --psx-branch         main" \
 "" \
 "Examples:" \
+"  # Single network" \
 "  ./setup_ship.sh --token \"\$TOKEN\" \\" \
 "                 --hosts \"23.134.232.50@shore-STAR\" \\" \
 "                 --urls \"https://localhost:8443/ps,https://23.134.232.50:8443/ps\"" \
+"" \
+"  # Multi-network (2 NICs, each on a different L3 network)" \
+"  ./setup_ship.sh --token \"\$TOKEN\" \\" \
+"                 --hosts \"10.129.133.2@shore-net1%10.135.145.2 10.129.134.2@shore-net2%10.135.146.2\" \\" \
+"                 --urls \"https://localhost:8443/ps,https://10.129.133.2:8443/ps\"" \
 ""
   exit 1
 }
