@@ -95,7 +95,28 @@ ARCHIVER_CFG="${ARCHIVER_DIR}/archiver/config.yml"
 [[ -f "$ARCHIVER_CFG" ]] || { printf 'ERROR: Missing %s\n' "$ARCHIVER_CFG"; exit 1; }
 
 log "Update archiver config token"
-python3 "$ARCHIVER_DIR/scripts/archiver_update_config.py" "$ARCHIVER_CFG" --token "$TOKEN"
+python3 "$ARCHIVER_DIR/scripts/archiver_update_config.py" "$ARCHIVER_CFG" --token "$TOKEN" --no-up
+
+# Generate .env for docker-compose (required: ARCHIVER_DB_PASSWORD, ARCHIVER_BEARER_TOKEN, GRAFANA_ADMIN_PASSWORD)
+ARCHIVER_ENV="${ARCHIVER_DIR}/.env"
+if [[ ! -f "$ARCHIVER_ENV" ]]; then
+  log "Creating .env for archiver docker-compose"
+  DB_PASS="$(openssl rand -hex 16)"
+  cat > "$ARCHIVER_ENV" <<ENVEOF
+ARCHIVER_DB_PASSWORD=${DB_PASS}
+ARCHIVER_BEARER_TOKEN=${TOKEN}
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=perfsonar
+ENVEOF
+  log "Generated .env (Grafana login: admin/perfsonar)"
+else
+  log ".env already exists; updating bearer token"
+  sed -i "s|^ARCHIVER_BEARER_TOKEN=.*|ARCHIVER_BEARER_TOKEN=${TOKEN}|" "$ARCHIVER_ENV"
+fi
+
+# Launch the archiver stack from the repo root (where docker-compose.yml lives)
+log "docker compose up -d (archiver stack)"
+( cd "$ARCHIVER_DIR" && docker compose up -d )
 
 log "Done."
 printf '%s\n' \
