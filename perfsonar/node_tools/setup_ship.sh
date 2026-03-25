@@ -11,6 +11,7 @@ usage() {
 "  ./setup_ship.sh --token TOKEN --hosts \"IP@name[%srcIP] ...\" --urls \"https://a/ps,https://b/ps\"" \
 "                 [--workdir PATH] [--archiver-repo URL] [--psx-repo URL]" \
 "                 [--archiver-branch BRANCH] [--psx-branch BRANCH]" \
+"                 [--nmea-port PORT] [--vessel-id ID]" \
 "                 [--no-sudo] [--verbose]" \
 "" \
 "Host format:" \
@@ -24,6 +25,8 @@ usage() {
 "  --psx-repo           https://github.com/kthare10/perfsonar-extensions.git" \
 "  --archiver-branch    main" \
 "  --psx-branch         main" \
+"  --nmea-port          13551   (set to enable NMEA listener; omit to skip)" \
+"  --vessel-id          rv-thompson" \
 "" \
 "Examples:" \
 "  # Single network" \
@@ -51,6 +54,8 @@ VERBOSE=0
 TOKEN=""
 HOSTS=""
 URLS=""
+NMEA_PORT=""
+VESSEL_ID="rv-thompson"
 
 # ---------- argparse ----------
 while [[ $# -gt 0 ]]; do
@@ -63,6 +68,8 @@ while [[ $# -gt 0 ]]; do
     --psx-repo) PSX_REPO="${2:-}"; shift 2 ;;
     --archiver-branch) ARCHIVER_BRANCH="${2:-}"; shift 2 ;;
     --psx-branch) PSX_BRANCH="${2:-}"; shift 2 ;;
+    --nmea-port) NMEA_PORT="${2:-}"; shift 2 ;;
+    --vessel-id) VESSEL_ID="${2:-}"; shift 2 ;;
     --no-sudo) USE_SUDO=0; shift ;;
     --verbose|-v) VERBOSE=1; shift ;;
     -h|--help) usage ;;
@@ -172,6 +179,32 @@ for i in $(seq 1 30); do
   fi
   sleep 2
 done
+
+# 4) NMEA listener (optional — only if --nmea-port is set)
+if [[ -n "$NMEA_PORT" ]]; then
+  NMEA_DIR="${PSX_DIR}/nmea-listener"
+  if [[ -d "$NMEA_DIR" ]]; then
+    log "Setting up NMEA listener (port=$NMEA_PORT, vessel=$VESSEL_ID)"
+
+    NMEA_ENV="${NMEA_DIR}/.env"
+    if [[ ! -f "$NMEA_ENV" ]]; then
+      cp "${NMEA_DIR}/env.template" "$NMEA_ENV"
+    fi
+
+    # Update NMEA .env with current settings
+    sed -i "s|^NMEA_UDP_PORT=.*|NMEA_UDP_PORT=${NMEA_PORT}|" "$NMEA_ENV"
+    sed -i "s|^AUTH_TOKEN=.*|AUTH_TOKEN=${TOKEN}|" "$NMEA_ENV"
+    sed -i "s|^ARCHIVE_URLS=.*|ARCHIVE_URLS=${URLS}|" "$NMEA_ENV"
+    sed -i "s|^VESSEL_ID=.*|VESSEL_ID=${VESSEL_ID}|" "$NMEA_ENV"
+
+    log "docker compose up -d (nmea-listener)"
+    ( cd "$NMEA_DIR" && docker compose -f docker-compose-nmea.yml up -d --build )
+  else
+    log "WARN: nmea-listener directory not found at $NMEA_DIR; skipping"
+  fi
+else
+  log "NMEA listener not requested (use --nmea-port to enable)"
+fi
 
 log "Done."
 printf '%s\n' \
