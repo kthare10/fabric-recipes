@@ -31,8 +31,11 @@ Deploys a **ship-side and shore-side** monitoring setup using the custom lightwe
 - **Shore VM**: Single NIC, runs archiver stack and receives results from ship
 - **Archiver**: Custom stack (TimescaleDB, Grafana, REST Archiver, Nginx) on both VMs
 - **Tests**: Latency, RTT, throughput, MTU, clock offset, traceroute — every 6 hours
+- **NMEA listener** *(optional)*: Captures NMEA 0183 navigation data (GPS, heading, roll/pitch/heave) from vessel broadcasts and archives it alongside network measurements. Enable with `ENABLE_NMEA = True` in the config cell.
+- **Nav Correlation Dashboard**: Grafana dashboard correlating network performance metrics with vessel motion — throughput vs. roll/pitch, RTT vs. heave, vessel position map
 - **Archiving**: Bidirectional — ship archives locally and to shore; shore archives locally
 - **Access**: Grafana via SSH tunnel at `https://127.0.0.1:8443`
+- **Validation scripts**: Automated deployment verification (`validate_deployment.sh`, `validate_cross.sh`, `validate_nmea.sh`) run directly on VMs
 - **Resource requirements**: Ship as low as 4 cores / 16 GB RAM; Shore 16 cores / 32 GB RAM
 
 **Best for**: Edge/vessel deployments, resource-constrained environments, scenarios requiring local + remote redundancy.
@@ -69,8 +72,20 @@ Nearly identical to notebook 2, but uses **FabNetv4Ext** networks for publicly r
 3. Run cells sequentially — setup scripts are cloned from the [fabric-recipes](https://github.com/kthare10/fabric-recipes) repository directly onto the VMs.
 4. For the custom archiver notebook, Grafana credentials default to `admin/perfsonar`.
 
+## Validation Scripts
+
+The `node_tools/` directory includes standalone validation scripts that can be run directly on deployed VMs (the notebook calls these automatically):
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `validate_deployment.sh` | Verify Docker containers, DB, API, Grafana, TLS | `--role shore\|ship --token TOKEN [--nmea]` |
+| `validate_cross.sh` | Test ping, remote archiver, pScheduler reachability | `--token TOKEN --remote-ip IP [--src-ips "IP1 IP2"]` |
+| `validate_nmea.sh` | Run NMEA simulator, verify DB ingestion, API endpoints | `--token TOKEN [--sim-port PORT] [--remote-ip IP]` |
+
+All scripts output PASS/FAIL summaries and exit with code 1 on any failure.
+
 ## Related Repositories
 
-- [pscheduler-result-archiver](https://github.com/kthare10/pscheduler-result-archiver) — Custom archiver REST API, TimescaleDB schema, Grafana dashboards, Docker Compose stack
-- [perfsonar-extensions](https://github.com/kthare10/perfsonar-extensions) — Docker-based perfSONAR testpoint with cron-scheduled test execution and multi-archiver support
+- [pscheduler-result-archiver](https://github.com/kthare10/pscheduler-result-archiver) — Custom archiver REST API, TimescaleDB schema, Grafana dashboards (including Nav Correlation), Docker Compose stack
+- [perfsonar-extensions](https://github.com/kthare10/perfsonar-extensions) — Docker-based perfSONAR testpoint with cron-scheduled test execution, multi-archiver support, and NMEA 0183 navigation data listener
 - [fabric-recipes](https://github.com/kthare10/fabric-recipes) — FABRIC experiment notebooks and deployment scripts (canonical location for `node_tools/`)

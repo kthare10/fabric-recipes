@@ -12,6 +12,8 @@ We have added a new notebook demonstrating how to deploy and run perfSONAR-based
   * Deploys a ship-side VM (emulated in FABRIC) with a Docker-based perfSONAR testpoint.
   * Automates periodic network tests (throughput, RTT, latency, trace).
   * Stores results locally and remotely for visualization.
+  * Optionally deploys an **NMEA 0183 navigation data listener** for correlating network performance with vessel motion (GPS position, heading, roll/pitch/heave).
+  * Includes **validation scripts** for automated deployment verification (`validate_deployment.sh`, `validate_cross.sh`, `validate_nmea.sh`).
   * Compatible with FABRIC resources or other environments.
 
 This notebook is particularly useful for mobile edge simulations (e.g., ship-to-shore), but can also be generalized for any network performance experiment between FABRIC sites.
