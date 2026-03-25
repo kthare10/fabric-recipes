@@ -30,7 +30,7 @@ Deploys a **ship-side and shore-side** monitoring setup using the custom lightwe
 - **Ship VM**: Multiple NICs for independent measurement of each network path, using `%` source-binding syntax (`dst_ip@name%interface`)
 - **Shore VM**: Single NIC, runs archiver stack and receives results from ship
 - **Archiver**: Custom stack (TimescaleDB, Grafana, REST Archiver, Nginx) on both VMs
-- **Tests**: Latency, RTT, throughput, MTU, clock offset, traceroute — every 4 hours
+- **Tests**: Latency, RTT, throughput, MTU, clock offset, traceroute — every 6 hours
 - **Archiving**: Bidirectional — ship archives locally and to shore; shore archives locally
 - **Access**: Grafana via SSH tunnel at `https://127.0.0.1:8443`
 - **Resource requirements**: Ship as low as 4 cores / 16 GB RAM; Shore 16 cores / 32 GB RAM
