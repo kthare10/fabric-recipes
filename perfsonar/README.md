@@ -33,6 +33,7 @@ Deploys a **ship-side and shore-side** monitoring setup using the custom lightwe
 - **Tests**: Latency, RTT, throughput, MTU, clock offset, traceroute — every 6 hours
 - **NMEA listener** *(optional)*: Captures NMEA 0183 navigation data (GPS, heading, roll/pitch/heave) from vessel broadcasts and archives it alongside network measurements. Enable with `ENABLE_NMEA = True` in the config cell.
 - **Nav Correlation Dashboard**: Grafana dashboard correlating network performance metrics with vessel motion — throughput vs. roll/pitch, RTT vs. heave, vessel position map
+- **Environmental Correlation Dashboard**: Stacked time-aligned Grafana panels for throughput, RTT, latency, heading, roll, pitch, heave — enables visual correlation of network performance with vessel motion
 - **Archiving**: Bidirectional — ship archives locally and to shore; shore archives locally
 - **Access**: Grafana via SSH tunnel at `https://127.0.0.1:8443`
 - **Validation scripts**: Automated deployment verification (`validate_deployment.sh`, `validate_cross.sh`, `validate_nmea.sh`) run directly on VMs
