@@ -196,6 +196,10 @@ if [[ -n "$NMEA_PORT" ]]; then
     sed -i "s|^AUTH_TOKEN=.*|AUTH_TOKEN=${TOKEN}|" "$NMEA_ENV"
     sed -i "s|^ARCHIVE_URLS=.*|ARCHIVE_URLS=${URLS}|" "$NMEA_ENV"
     sed -i "s|^VESSEL_ID=.*|VESSEL_ID=${VESSEL_ID}|" "$NMEA_ENV"
+    # Per-destination flush intervals (local=5min, remote=6hrs)
+    sed -i "s|^FLUSH_INTERVAL_S=.*|FLUSH_INTERVAL_S=300|" "$NMEA_ENV"
+    sed -i "s|^REMOTE_FLUSH_INTERVAL_S=.*|REMOTE_FLUSH_INTERVAL_S=21600|" "$NMEA_ENV"
+    sed -i "s|^BATCH_SIZE=.*|BATCH_SIZE=65000|" "$NMEA_ENV"
 
     log "docker compose up -d (nmea-listener)"
     ( cd "$NMEA_DIR" && docker compose -f docker-compose-nmea.yml up -d --build )
